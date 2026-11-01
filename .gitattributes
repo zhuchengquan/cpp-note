@@ -1,0 +1,12 @@
+# 统一文本文件换行符，避免 Windows CRLF 造成跨平台 diff 噪音
+* text=auto eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.webmanifest text eol=lf
+*.yml text eol=lf
+*.png binary
+*.ico binary
+*.jpg binary

@@ -1,0 +1,25 @@
+{
+  "name": "信息学 C++ 学习手册 · CSP-J/S",
+  "short_name": "C++学习手册",
+  "description": "面向 CSP-J/CSP-S 信奥学员的系统化 C++ 讲义：知识点、带注释代码、例题、练习、测验、模板默写与 AI 私教，完全离线可用。",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "categories": ["education", "books", "reference"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "继续学习", "url": "./index.html#/", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "模板速查", "url": "./index.html#/tpl", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "章末测验", "url": "./index.html#/quiz", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

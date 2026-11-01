@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>信息学 C++ 学习手册 | CSP-J/S 从入门到 NOI 系统讲义</title>
+
+<!-- ===== SEO / 社交分享 ===== -->
+<meta name="description" content="面向信息学奥赛学员的系统化 C++ 讲义：114 个知识点、近 600 段带中文注释代码、例题精讲、课后练习、章末测验、背模板默写与 AI 私教。零依赖、双击即用、完全离线。" />
+<meta name="keywords" content="C++,信息学奥赛,CSP-J,CSP-S,NOIP,NOI,算法竞赛,信奥,讲义,模板,离线" />
+<meta name="author" content="cpp-note contributors" />
+<meta name="theme-color" content="#2563eb" />
+<meta name="color-scheme" content="light dark" />
+<link rel="canonical" href="./index.html" />
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="信息学 C++ 学习手册 | CSP-J/S 从入门到 NOI" />
+<meta property="og:description" content="114 个知识点 · 近 600 段带注释代码 · 例题/练习/测验/默写/AI 私教，零依赖完全离线。" />
+<meta property="og:locale" content="zh_CN" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<!-- ===== PWA：可安装、可离线 ===== -->
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="C++学习手册" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📘</text></svg>" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+
+<!-- 代码高亮主题（本地内置，离线可用） -->
+<link rel="stylesheet" href="vendor/atom-one-dark.min.css" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<a class="skip-link" href="#content">跳到正文</a>
+<div id="appBoot" class="app-boot"><div class="boot-card"><span class="boot-logo">📘</span><p>正在加载学习手册…</p></div></div>
+<div id="readProgress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100"></div>
+<button id="toTop" title="回到顶部" aria-label="回到顶部">↑</button>
+
+<!-- ============ 左侧大纲栏 ============ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-emoji">📘</span>
+    <div class="logo-text">
+      <strong>信息学 C++</strong>
+      <small>CSP-J / CSP-S 学习手册</small>
+    </div>
+  </div>
+
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input id="searchInput" type="search" placeholder="搜索知识点… 如 循环、DP、Dijkstra" autocomplete="off" />
+  </div>
+
+  <nav id="outlineNav" class="outline-nav"></nav>
+
+  <div class="sidebar-foot">
+    <span id="footProgressText">已掌握 0 / 0</span>
+    <div class="mini-progress"><div id="footProgressBar"></div></div>
+  </div>
+</aside>
+<div id="sidebarMask"></div>
+
+<!-- ============ 主内容区 ============ -->
+<div id="main">
+  <header id="topbar">
+    <button id="menuBtn" class="icon-btn" title="目录" aria-label="打开或关闭章节目录">☰</button>
+    <div id="breadcrumb" class="breadcrumb" role="navigation" aria-label="当前位置"></div>
+    <div class="topbar-actions">
+      <button id="statsNavBtn" class="btn-ghost" title="学习数据看板">📊 <span class="lbl">看板</span></button>
+      <button id="tplNavBtn" class="btn-ghost" title="算法模板速查">🧩 <span class="lbl">模板</span></button>
+      <button id="bookBtn" class="btn-ghost" title="我的收藏与错题本">⭐ <span class="lbl">收藏</span></button>
+      <button id="noteToggleBtn" class="btn-ghost" title="打开/关闭笔记面板 (Ctrl+J)">📝 <span class="lbl">笔记</span></button>
+      <button id="themeBtn" class="icon-btn" title="切换主题">🌙</button>
+      <button id="settingsBtn" class="icon-btn" title="设置">⚙️</button>
+    </div>
+  </header>
+
+  <main id="content" class="content-wrap"></main>
+
+  <footer id="siteFooter">
+    <p>信息学 C++ 学习手册 · 面向 CSP-J/S 信奥学员 · 所有学习数据仅保存在本机浏览器</p>
+  </footer>
+</div>
+
+<!-- ============ 右侧笔记面板 ============ -->
+<aside id="notePanel">
+  <div class="panel-head">
+    <span>📝 我的笔记</span>
+    <div>
+      <button id="noteModeBtn" class="btn-mini" title="切换编辑/预览">预览</button>
+      <button id="noteCloseBtn" class="icon-btn-sm" title="关闭">✕</button>
+    </div>
+  </div>
+  <div class="panel-sub" id="noteSub">在任意知识点页记录你的理解，自动保存</div>
+  <div id="noteEditorWrap">
+    <textarea id="noteEditor" placeholder="在这里记笔记… 支持 Markdown 语法：
+## 标题
+- 要点
+**重点**、`代码`
+```cpp
+// 代码块
+```
+内容会自动保存到本知识点下。"></textarea>
+    <div id="notePreview" class="md-body note-preview" hidden></div>
+  </div>
+  <div class="panel-foot" id="noteStatus">未开始记录</div>
+</aside>
+
+<!-- ============ 在线运行沙箱 ============ -->
+<section id="runnerPanel" aria-label="C++ 在线运行">
+  <div class="run-head">
+    <span>▶️ 在线运行 C++</span>
+    <span class="run-note">代码发送到 Wandbox 公共编译服务（GCC / C++17），请勿提交隐私代码</span>
+    <button id="runCloseBtn" class="icon-btn-sm" title="关闭">✕</button>
+  </div>
+  <div class="run-body">
+    <span class="run-label">代码</span>
+    <textarea id="runCode" spellcheck="false"></textarea>
+    <span class="run-label">标准输入（可选）</span>
+    <textarea id="runStdin" placeholder="程序需要 cin 输入的数据写在这里…" spellcheck="false"></textarea>
+    <div><button id="runBtn">▶ 编译并运行</button></div>
+    <div id="runOut"></div>
+  </div>
+</section>
+
+<!-- ============ AI 私教：悬浮按钮 + 聊天窗 ============ -->
+<button id="aiFab"><span>🤖</span><em>AI 私教</em></button>
+
+<section id="aiPanel" hidden>
+  <div class="panel-head ai-head">
+    <span>🤖 AI 私教 <small id="aiProviderTag">未配置</small></span>
+    <div>
+      <button id="aiClearBtn" class="btn-mini" title="清空对话">清空</button>
+      <button id="aiCloseBtn" class="icon-btn-sm">✕</button>
+    </div>
+  </div>
+  <div id="aiMessages" class="ai-messages"></div>
+  <div id="aiQuick" class="ai-quick"></div>
+  <div class="ai-input-wrap">
+    <textarea id="aiInput" rows="2" placeholder="提问 / 贴代码…  Enter 发送，Shift+Enter 换行"></textarea>
+    <button id="aiSendBtn" class="btn-primary">发送</button>
+    <button id="aiStopBtn" class="btn-ghost" hidden>停止</button>
+  </div>
+</section>
+
+<!-- ============ 设置弹窗 ============ -->
+<div id="modalMask" hidden>
+  <div id="settingsModal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3>⚙️ 设置</h3>
+      <button id="modalCloseBtn" class="icon-btn-sm">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="tab-btn active" data-tab="ai">🤖 AI 私教</button>
+      <button class="tab-btn" data-tab="look">🎨 外观</button>
+      <button class="tab-btn" data-tab="data">💾 学习数据</button>
+    </div>
+
+    <!-- AI 设置 -->
+    <div class="tab-pane active" data-pane="ai">
+      <label class="field-label">服务商</label>
+      <select id="aiProvider"></select>
+      <label class="field-label">接口地址 (Base URL)</label>
+      <input id="aiBaseUrl" type="text" spellcheck="false" />
+      <label class="field-label">模型名称 (Model)</label>
+      <input id="aiModel" type="text" spellcheck="false" />
+      <label class="field-label">API Key <small>（仅保存在本机浏览器，不会上传到任何第三方）</small></label>
+      <div class="key-row">
+        <input id="aiKey" type="password" spellcheck="false" placeholder="sk-..." />
+        <button id="aiKeyEye" class="btn-mini" type="button">显示</button>
+      </div>
+      <div class="form-row">
+        <button id="aiTestBtn" class="btn-ghost">🔌 测试连接</button>
+        <span id="aiTestResult" class="test-result"></span>
+      </div>
+      <div class="hint-box">
+        <p><b>如何获取免费 / 低价 Key？</b></p>
+        <p>各服务商均兼容 OpenAI 接口格式，注册后在官网「API Keys」页面创建：</p>
+        <ul>
+          <li>DeepSeek（便宜好用，推荐）：platform.deepseek.com</li>
+          <li>通义千问（有免费额度）：dashscope.console.aliyun.com</li>
+          <li>智谱 GLM（有免费额度）：open.bigmodel.cn</li>
+          <li>Kimi 月之暗面：platform.moonshot.cn</li>
+        </ul>
+        <p>没有 Key 也能使用本手册全部知识内容，AI 只是私教答疑功能。</p>
+      </div>
+    </div>
+
+    <!-- 外观设置 -->
+    <div class="tab-pane" data-pane="look">
+      <label class="field-label">主题</label>
+      <div class="theme-options">
+        <button class="theme-card" data-set-theme="light"><span class="theme-dot" style="background:#fff;border:1px solid #ddd"></span>☀️ 明亮</button>
+        <button class="theme-card" data-set-theme="eye"><span class="theme-dot" style="background:#c7e6c9"></span>🌿 护眼</button>
+        <button class="theme-card" data-set-theme="dark"><span class="theme-dot" style="background:#1a2233"></span>🌙 深色</button>
+      </div>
+      <label class="field-label">正文字号：<b id="fontSizeVal">16px</b></label>
+      <input id="fontSizeRange" type="range" min="14" max="20" step="1" value="16" />
+    </div>
+
+    <!-- 数据设置 -->
+    <div class="tab-pane" data-pane="data">
+      <div class="data-stats" id="dataStats"></div>
+      <div class="form-row wrap">
+        <button id="exportJsonBtn" class="btn-ghost">📦 导出备份 (JSON)</button>
+        <button id="exportNotesBtn" class="btn-ghost">📝 导出全部笔记 (Markdown)</button>
+        <button id="importBtn" class="btn-ghost">📂 导入备份</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden />
+      </div>
+      <div class="form-row">
+        <button id="resetProgressBtn" class="btn-danger-ghost">🗑️ 清空学习进度</button>
+        <button id="resetAllBtn" class="btn-danger-ghost">💣 清空全部数据</button>
+      </div>
+      <div class="hint-box">
+        <p>备份包含：学习进度、全部知识点笔记、AI 对话记录、外观设置。<b>API Key 不导出</b>。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 命令面板（Ctrl/⌘ + K） -->
+<div id="cmdkMask" class="cmdk-mask" hidden>
+  <div class="cmdk" role="dialog" aria-modal="true" aria-label="命令面板">
+    <div class="cmdk-input-row">
+      <span class="cmdk-icon">🔍</span>
+      <input id="cmdkInput" type="search" placeholder="搜索知识点或输入操作，如 看板 / 测验 / Dijkstra…" autocomplete="off" />
+      <kbd>Esc</kbd>
+    </div>
+    <div id="cmdkResults" class="cmdk-results" role="listbox"></div>
+    <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> 选择 <kbd>Enter</kbd> 打开</span><span><kbd>Ctrl/⌘</kbd>+<kbd>K</kbd> 唤起</span></div>
+  </div>
+</div>
+
+<!-- 快捷键帮助 -->
+<div id="helpMask" class="modal-mask2" hidden>
+  <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-head">
+      <h3 id="helpTitle">⌨️ 快捷键一览</h3>
+      <button id="helpCloseBtn" class="icon-btn-sm" aria-label="关闭">✕</button>
+    </div>
+    <div class="help-body">
+      <div class="help-col">
+        <h4>导航与阅读</h4>
+        <ul>
+          <li><kbd>/</kbd><span>聚焦搜索框</span></li>
+          <li><kbd>?</kbd><span>打开本帮助</span></li>
+          <li><kbd>Esc</kbd><span>关闭弹层 / 面板</span></li>
+          <li><kbd>Ctrl/⌘</kbd>+<kbd>B</kbd><span>切换左侧目录</span></li>
+          <li><kbd>←</kbd> / <kbd>→</kbd><span>上 / 下一个知识点</span></li>
+        </ul>
+      </div>
+      <div class="help-col">
+        <h4>笔记与面板</h4>
+        <ul>
+          <li><kbd>Ctrl/⌘</kbd>+<kbd>J</kbd><span>切换笔记面板</span></li>
+          <li><kbd>Ctrl/⌘</kbd>+<kbd>P</kbd><span>打印 / 导出 PDF</span></li>
+        </ul>
+        <h4>提示</h4>
+        <p class="help-tip">侧栏知识点上<b>双击圆点</b>可循环切换学习状态；数据全部保存在本机浏览器，设置里可一键备份。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 全局提示 -->
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- PWA：可安装 / 有新版本 横幅 -->
+<div id="pwaBar" class="pwa-bar" hidden>
+  <span id="pwaMsg" class="pwa-msg"></span>
+  <span class="pwa-actions">
+    <button id="pwaConfirm" class="pwa-btn primary"></button>
+    <button id="pwaDismiss" class="pwa-btn">稍后</button>
+  </span>
+</div>
+
+<!-- 数据注册（文件内自行挂载到 window.TOPICS） -->
+<script>window.TOPICS = {};</script>
+
+<!-- Markdown 渲染 + 代码高亮 + XSS 消毒（本地内置，无需联网；marked 缺失时自动降级渲染） -->
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/highlight.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+
+<!-- ====== 大纲数据 ====== -->
+<script src="js/data/outline.js"></script>
+
+<!-- ====== 第一部分：入门篇（12 章） ====== -->
+<script src="js/data/p1-01.js"></script>
+<script src="js/data/p1-02.js"></script>
+<script src="js/data/p1-03.js"></script>
+<script src="js/data/p1-04.js"></script>
+<script src="js/data/p1-05.js"></script>
+<script src="js/data/p1-06.js"></script>
+<script src="js/data/p1-07.js"></script>
+<script src="js/data/p1-08.js"></script>
+<script src="js/data/p1-09.js"></script>
+<script src="js/data/p1-10.js"></script>
+<script src="js/data/p1-11.js"></script>
+<script src="js/data/p1-12.js"></script>
+
+<!-- ====== 第二部分：CSP-J 普及组（持续更新中） ====== -->
+<script src="js/data/p2-01.js"></script>
+<script src="js/data/p2-02.js"></script>
+<script src="js/data/p2-03.js"></script>
+<script src="js/data/p2-04.js"></script>
+<script src="js/data/p2-05.js"></script>
+<script src="js/data/p2-06.js"></script>
+<script src="js/data/p2-07.js"></script>
+<script src="js/data/p2-08.js"></script>
+<script src="js/data/p2-09.js"></script>
+<script src="js/data/p2-10.js"></script>
+<script src="js/data/p2-11.js"></script>
+<script src="js/data/p2-12.js"></script>
+<script src="js/data/p2-13.js"></script>
+<script src="js/data/p2-14.js"></script>
+<!-- ===== 第三部分 CSP-S 提高篇 ===== -->
+<script src="js/data/p3-01.js"></script>
+<script src="js/data/p3-02.js"></script>
+<script src="js/data/p3-03.js"></script>
+<script src="js/data/p3-04.js"></script>
+<script src="js/data/p3-05.js"></script>
+<script src="js/data/p3-06.js"></script>
+<script src="js/data/p3-07.js"></script>
+<script src="js/data/p3-08.js"></script>
+<script src="js/data/p3-09.js"></script>
+<script src="js/data/p3-10.js"></script>
+<script src="js/data/p3-11.js"></script>
+<script src="js/data/p3-12.js"></script>
+<script src="js/data/p3-13.js"></script>
+<script src="js/data/p3-14.js"></script>
+<script src="js/data/p3-15.js"></script>
+<script src="js/data/p3-16.js"></script>
+
+<!-- 第四部分 考级与初赛专题 -->
+<script src="js/data/p4-01.js"></script>
+<script src="js/data/p4-02.js"></script>
+<script src="js/data/p4-03.js"></script>
+<script src="js/data/p4-04.js"></script>
+
+<!-- 第五部分 竞赛算法进阶 -->
+<script src="js/data/p5-01.js"></script>
+<script src="js/data/p5-02.js"></script>
+<script src="js/data/p5-03.js"></script>
+
+<!-- 第六部分 高阶算法专题 -->
+<script src="js/data/p6-01.js"></script>
+<script src="js/data/p6-02.js"></script>
+<script src="js/data/p6-03.js"></script>
+
+<!-- 第七部分 字符串、网络流与多项式 -->
+<script src="js/data/p7-01.js"></script>
+<script src="js/data/p7-02.js"></script>
+<script src="js/data/p7-03.js"></script>
+
+<!-- 第八部分 可持久化、线性基与莫队 -->
+<script src="js/data/p8-01.js"></script>
+<script src="js/data/p8-02.js"></script>
+<script src="js/data/p8-03.js"></script>
+
+<!-- 第九部分 NOI 前沿专题 -->
+<script src="js/data/p9-01.js"></script>
+<script src="js/data/p9-02.js"></script>
+<script src="js/data/p9-03.js"></script>
+
+<!-- 真题与经典名题精讲（按部分追加） -->
+<script src="js/data/realexam-p2.js"></script>
+<script src="js/data/realexam-p2b.js"></script>
+<script src="js/data/realexam-p3.js"></script>
+<script src="js/data/realexam-p3b.js"></script>
+<script src="js/data/realexam-p3c.js"></script>
+<script src="js/data/realexam-p4.js"></script>
+<script src="js/data/realexam-p5.js"></script>
+
+<!-- 知识图谱关联 + 核心模板速记 -->
+<script src="js/data/relations.js"></script>
+<script src="js/data/templates-p1.js"></script>
+<script src="js/data/templates-p2.js"></script>
+<script src="js/data/templates-p3.js"></script>
+<script src="js/data/templates-p4.js"></script>
+<script src="js/data/templates-p5.js"></script>
+<script src="js/data/templates-p6.js"></script>
+<script src="js/data/templates-p7.js"></script>
+<script src="js/data/templates-p8.js"></script>
+<script src="js/data/quiz-p1.js"></script>
+<script src="js/data/quiz-p2.js"></script>
+<script src="js/data/quiz-p3.js"></script>
+<script src="js/data/quiz-p4.js"></script>
+<script src="js/data/quiz-p5.js"></script>
+<script src="js/data/quiz-p6.js"></script>
+<script src="js/data/quiz-p7.js"></script>
+<script src="js/data/quiz-p8.js"></script>
+<script src="js/data/quiz-p9.js"></script>
+
+<script src="js/store.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

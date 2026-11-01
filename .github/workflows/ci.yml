@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 语法检查 + 数据完整性
+        run: npm run check
+
+      - name: 校验 sw.js 与引用一致（构建产物需已提交）
+        run: |
+          node scripts/build-sw.js
+          if ! git diff --quiet -- sw.js; then
+            echo "sw.js 与 index.html 引用不一致，请运行 node scripts/build-sw.js 并提交"
+            git --no-pager diff -- sw.js
+            exit 1
+          fi
+
+      - name: 安装 Chromium（无头测试用）
+        run: |
+          if ! command -v google-chrome && ! command -v chromium && ! command -v chromium-browser; then
+            sudo apt-get update && sudo apt-get install -y chromium-browser || sudo snap install chromium
+          fi
+
+      - name: 启动本地服务器
+        run: |
+          node scripts/serve.js 8123 &
+          for i in $(seq 1 30); do curl -sf http://localhost:8123/index.html >/dev/null && break; sleep 1; done
+
+      - name: 无头浏览器冒烟测试
+        run: node scripts/smoke.js
+
+      - name: PWA 离线能力验证
+        run: node scripts/verify-pwa.js
+
+      - name: 上传冒烟截图
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: scripts/smoke-*.png
+          if-no-files-found: ignore

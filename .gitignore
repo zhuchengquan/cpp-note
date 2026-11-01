@@ -1,0 +1,23 @@
+# 依赖（本项目零运行时依赖；node_modules 仅供脚本/CI 使用）
+node_modules/
+
+# 临时 QA / 构建产物
+*.tmp.js
+*.tmp.json
+*.log
+dist/
+.cache/
+scripts/smoke-*.png
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# 本地服务器
+.hexo/
+_site/

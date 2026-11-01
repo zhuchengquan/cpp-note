@@ -1,0 +1,31 @@
+{
+  "name": "cpp-note",
+  "version": "1.1.0",
+  "private": true,
+  "description": "信息学 C++ 学习手册（CSP-J/CSP-S）：零依赖、双击即用、完全离线的静态学习网站",
+  "type": "commonjs",
+  "scripts": {
+    "check": "node scripts/check-syntax.js && node scripts/check-data.js",
+    "check:syntax": "node scripts/check-syntax.js",
+    "check:data": "node scripts/check-data.js",
+    "serve": "node scripts/serve.js 8000",
+    "smoke": "node scripts/smoke.js",
+    "verify:pwa": "node scripts/verify-pwa.js",
+    "icons": "node scripts/make-icons.js",
+    "build:sw": "node scripts/build-sw.js"
+  },
+  "keywords": [
+    "cpp",
+    "csp-j",
+    "csp-s",
+    "noi",
+    "olympiad",
+    "education",
+    "offline",
+    "static-site"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  }
+}
