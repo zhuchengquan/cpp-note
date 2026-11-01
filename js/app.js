@@ -189,7 +189,6 @@
      备份导入内容里的 XSS。自有讲义内容是受信任的，但统一走此出口也无害
      （会保留 class、target 等，配置见下方 ALLOWED_ATTR）。
      DOMPurify 意外缺失时退化为转义 <script> 等危险标签的保守策略，绝不裸渲染。 */
-  const PURIFY_HOOKED = Symbol ? null : null;
   function sanitizeHtml(html) {
     if (window.DOMPurify && window.DOMPurify.sanitize) {
       return window.DOMPurify.sanitize(html, {

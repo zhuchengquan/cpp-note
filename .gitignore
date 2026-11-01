@@ -8,6 +8,7 @@ node_modules/
 dist/
 .cache/
 scripts/smoke-*.png
+scripts/shots/
 
 # 系统与编辑器
 .DS_Store

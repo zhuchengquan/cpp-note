@@ -41,8 +41,14 @@ jobs:
       - name: 无头浏览器冒烟测试
         run: node scripts/smoke.js
 
+      - name: 布局/响应式断言（桌面+移动、多主题、无横向溢出）
+        run: node scripts/layout-check.js
+
       - name: PWA 离线能力验证
         run: node scripts/verify-pwa.js
+
+      - name: file:// 双击模式兼容性验证
+        run: node scripts/verify-file.js
 
       - name: 上传冒烟截图
         if: always()

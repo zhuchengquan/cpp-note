@@ -178,6 +178,9 @@ npm run check        # JS 语法检查 + 全站数据完整性校验
 npm run check:data   # 交叉校验大纲/正文/模板/图谱/测验引用、围栏配平、死链
 npm run serve        # 零依赖本地静态服务器（含目录穿越防护）
 npm run smoke        # 无头 Edge/Chrome 冒烟测试（20+ 断言 + 桌面/移动截图）
+npm run layout       # 桌面/移动端 × 多页面 × 多主题布局断言（无横向溢出等）
+npm run verify:pwa   # 注册 SW → 模拟断网 → 重载，验证离线完整可用
+npm run verify:file  # 验证双击 file:// 模式完整可用、零异常、不注册 SW
 node scripts/make-icons.js   # 重新生成 PWA 图标
 node scripts/build-sw.js     # 由 index.html 重新生成 sw.js 预缓存清单
 ```

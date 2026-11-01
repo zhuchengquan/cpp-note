@@ -10,7 +10,9 @@
     "check:data": "node scripts/check-data.js",
     "serve": "node scripts/serve.js 8000",
     "smoke": "node scripts/smoke.js",
+    "layout": "node scripts/layout-check.js",
     "verify:pwa": "node scripts/verify-pwa.js",
+    "shots": "node scripts/shots.js",
     "icons": "node scripts/make-icons.js",
     "build:sw": "node scripts/build-sw.js"
   },

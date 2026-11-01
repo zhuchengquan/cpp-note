@@ -1044,11 +1044,11 @@ kbd {
 @media (max-width: 640px) { .sp-name { flex-basis: 130px; } }
 
 /* 热力图 */
-.heatmap { overflow-x: auto; padding-bottom: 4px; }
-.hm-months { display: grid; grid-template-columns: repeat(20, 1fr); font-size: 10.5px; color: var(--muted); margin: 0 0 6px 2px; min-width: 460px; }
-.hm-grid { display: flex; gap: 3px; min-width: 460px; }
-.hm-col { display: flex; flex-direction: column; gap: 3px; }
-.hm-cell { width: 19px; height: 19px; border-radius: 4px; background: var(--border); display: block; }
+.heatmap { padding-bottom: 4px; }
+.hm-months { display: grid; grid-template-columns: repeat(20, 1fr); font-size: 10.5px; color: var(--muted); margin: 0 0 6px 2px; }
+.hm-grid { display: flex; gap: 3px; }
+.hm-col { display: flex; flex: 1 1 0; flex-direction: column; gap: 3px; min-width: 0; }
+.hm-cell { width: 100%; aspect-ratio: 1 / 1; min-width: 0; border-radius: 3px; background: var(--border); display: block; }
 .hm-cell.lv0 { background: var(--border); }
 .hm-cell.lv1 { background: #93c5fd; }
 .hm-cell.lv2 { background: #60a5fa; }

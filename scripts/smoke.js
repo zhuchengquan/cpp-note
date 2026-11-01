@@ -13,9 +13,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
-const net = require('net');
-const crypto = require('crypto');
 const { spawn } = require('child_process');
+const { createWS } = require('./cdp');
 
 const TARGET = process.argv[2] || 'http://localhost:8123/index.html';
 const PORT = 9222;
@@ -43,84 +42,6 @@ const getJSON = (url) => new Promise((resolve, reject) => {
   }).on('error', reject);
 });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-/* 极简 WebSocket 客户端（CDP 需要），仅实现文本帧收发 */
-function createWS(wsUrl) {
-  const u = new URL(wsUrl);
-  const key = crypto.randomBytes(16).toString('base64');
-  const sock = net.connect(u.port, u.hostname);
-  const handlers = new Map();
-  const waiters = new Map();
-  let nextId = 1;
-  let buf = Buffer.alloc(0);
-  let handshaken = false;
-
-  const sendFrame = (str) => {
-    const payload = Buffer.from(str);
-    const len = payload.length;
-    let header;
-    if (len < 126) header = Buffer.from([0x81, 0x80 | len]);
-    else if (len < 65536) {
-      header = Buffer.alloc(4); header[0] = 0x81; header[1] = 0x80 | 126; header.writeUInt16BE(len, 2);
-    } else {
-      header = Buffer.alloc(10); header[0] = 0x81; header[1] = 0x80 | 127; header.writeBigUInt64BE(BigInt(len), 2);
-    }
-    const mask = crypto.randomBytes(4);
-    const masked = Buffer.alloc(len);
-    for (let i = 0; i < len; i++) masked[i] = payload[i] ^ mask[i % 4];
-    sock.write(Buffer.concat([header, mask, masked]));
-  };
-  const call = (method, params) => {
-    const id = nextId++;
-    return new Promise((resolve, reject) => {
-      waiters.set(id, { resolve, reject });
-      sendFrame(JSON.stringify({ id, method, params: params || {} }));
-    });
-  };
-  const on = (method, fn) => handlers.set(method, fn);
-  const parseFrames = () => {
-    while (buf.length >= 2) {
-      const opcode = buf[0] & 0x0f;
-      let len = buf[1] & 0x7f;
-      let off = 2;
-      if (len === 126) { len = buf.readUInt16BE(2); off = 4; }
-      else if (len === 127) { len = Number(buf.readBigUInt64BE(2)); off = 10; }
-      if (buf.length < off + len) return;
-      const payload = buf.slice(off, off + len).toString('utf8');
-      buf = buf.slice(off + len);
-      if (opcode === 1 || opcode === 0) {
-        const msg = JSON.parse(payload);
-        if (msg.id && waiters.has(msg.id)) {
-          const w = waiters.get(msg.id); waiters.delete(msg.id);
-          msg.error ? w.reject(new Error(msg.error.message)) : w.resolve(msg.result);
-        } else if (msg.method && handlers.has(msg.method)) {
-          handlers.get(msg.method)(msg.params);
-        }
-      }
-    }
-  };
-  return new Promise((resolve, reject) => {
-    sock.on('data', (chunk) => {
-      if (!handshaken) {
-        buf = Buffer.concat([buf, chunk]);
-        const marker = buf.indexOf('\r\n\r\n');
-        if (marker >= 0) {
-          handshaken = true;
-          buf = buf.slice(marker + 4);
-          resolve({ call, on });
-          parseFrames();
-        }
-        return;
-      }
-      buf = Buffer.concat([buf, chunk]);
-      parseFrames();
-    });
-    sock.on('error', reject);
-    sock.write(
-      `GET ${u.pathname} HTTP/1.1\r\nHost: ${u.hostname}\r\nUpgrade: websocket\r\n` +
-      `Connection: Upgrade\r\nSec-WebSocket-Key: ${key}\r\nSec-WebSocket-Version: 13\r\n\r\n`);
-  });
-}
 
 (async () => {
   const browserPath = findBrowser();
