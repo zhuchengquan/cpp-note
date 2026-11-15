@@ -1,6 +1,6 @@
 {
   "name": "cpp-note",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "信息学 C++ 学习手册（CSP-J/CSP-S）：零依赖、双击即用、完全离线的静态学习网站",
   "type": "commonjs",
@@ -11,6 +11,7 @@
     "serve": "node scripts/serve.js 8000",
     "smoke": "node scripts/smoke.js",
     "layout": "node scripts/layout-check.js",
+    "toc": "node scripts/toc-check.js",
     "verify:pwa": "node scripts/verify-pwa.js",
     "shots": "node scripts/shots.js",
     "icons": "node scripts/make-icons.js",
