@@ -44,9 +44,6 @@ jobs:
       - name: 布局/响应式断言（桌面+移动、多主题、无横向溢出）
         run: node scripts/layout-check.js
 
-      - name: 本页导航布局与交互断言
-        run: node scripts/toc-check.js
-
       - name: PWA 离线能力验证
         run: node scripts/verify-pwa.js
 

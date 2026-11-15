@@ -7,7 +7,7 @@
   'use strict';
 
   /* 版本号（单一事实来源；index.html 与 PWA 缓存版本同步） */
-  const APP_VERSION = '1.1.1';
+  const APP_VERSION = '1.1.2';
   window.APP_VERSION = APP_VERSION;
 
   /* 受控调试/自检钩子（不暴露内部数据写操作） */
@@ -522,24 +522,11 @@
     draw();
   }
 
-  /* 离开知识点页时彻底清理本页导航（卡片已移出 #content，必须显式移除） */
-  function clearToc() {
-    const card = document.getElementById('tocCard');
-    if (card) card.remove();
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
-    tocSectionEls = [];
-    const navBtn = $('#tocNavBtn');
-    if (navBtn) { navBtn.hidden = true; navBtn.setAttribute('aria-expanded', 'false'); }
-  }
-  window.__clearToc = clearToc;
-
   function router() {
     const hash = location.hash || '#/';
     const m = hash.match(/^#\/t\/([\w-]+)/);
     const qm = hash.match(/^#\/quiz\/?([\w-]+)/);
     $('#runnerPanel').classList.remove('open');
-    /* 每次路由切换都先清掉上一页的目录，再由知识点页按需重建 */
-    clearToc();
     if (hash === '#/tpl') {
       currentId = null;
       renderTemplatesPage();
@@ -741,7 +728,6 @@
     bodyHtml += pagerHtml(id);
     $('#content').innerHTML = headHtml + bodyHtml;
     enhance($('#content'));
-    buildToc();
     bindCardActions($('#content'));
 
     /* 状态切换 */
@@ -904,143 +890,6 @@
     </div>`;
   }
 
-  /* ---------- 本页导航 TOC ----------
-     两种形态，均脱离正文文档流，不占版面、不与正文重叠：
-       · toc-gutter  —— 宽屏右侧空白区足够时，浮动在正文右侧（sticky 跟随滚动）
-       · toc-popover —— 空间不足时收起，由顶栏「🧭 本页」按钮弹出
-     取舍由 layoutToc() 依据「正文右边缘到可用右边界」的真实空隙决定。 */
-  let tocObserver = null;
-  let tocSectionEls = [];
-  const TOC_W = 224;        // 目录宽度（与 CSS 保持一致）
-  const TOC_GAP = 20;       // 与正文的水平间距
-  const TOC_EDGE = 10;      // 与可用右边界的最小留白
-  const TOC_NEED = TOC_W + TOC_GAP + TOC_EDGE;
-
-  function buildToc() {
-    const old = document.getElementById('tocCard');
-    if (old) old.remove();
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
-    tocSectionEls = [];
-    const navBtn = $('#tocNavBtn');
-    if (navBtn) { navBtn.hidden = true; navBtn.setAttribute('aria-expanded', 'false'); }
-
-    const article = document.querySelector('#content .md-body');
-    if (!article) return;
-    const h2s = Array.from(article.querySelectorAll('h2'));
-    if (h2s.length < 2) return;
-
-    const card = document.createElement('aside');
-    card.id = 'tocCard';
-    card.className = 'toc-card';
-
-    const head = document.createElement('div');
-    head.className = 'toc-title';
-    head.innerHTML = '<span class="toc-label">🧭 本页导航</span>'
-      + '<button type="button" class="toc-close" aria-label="关闭本页导航">✕</button>'
-      + '<span class="toc-arrow" aria-hidden="true">▼</span>';
-    head.addEventListener('click', e => {
-      /* 弹层态：点关闭按钮收起；悬浮态：点标题折叠成小胶囊 */
-      if (e.target.closest('.toc-close')) { closeTocPopover(); return; }
-      if (card.classList.contains('toc-gutter')) {
-        card.classList.toggle('collapsed');
-        Store.setConf({ tocCollapsed: card.classList.contains('collapsed') });
-      }
-    });
-    card.appendChild(head);
-
-    const ul = document.createElement('ul');
-    ul.className = 'toc-list';
-    h2s.forEach((h, i) => {
-      h.id = 'sec-' + i;
-      h.style.scrollMarginTop = '76px';
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = '#sec-' + i;
-      a.textContent = h.textContent;
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        closeTocPopover();
-      });
-      li.appendChild(a);
-      ul.appendChild(li);
-      tocSectionEls.push(h);
-    });
-    card.appendChild(ul);
-    document.body.appendChild(card);
-
-    layoutToc();
-
-    if ('IntersectionObserver' in window) {
-      tocObserver = new IntersectionObserver(entries => {
-        entries.forEach(en => {
-          if (en.isIntersecting) {
-            ul.querySelectorAll('a').forEach(a =>
-              a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
-          }
-        });
-      }, { rootMargin: '-12% 0px -72% 0px' });
-      h2s.forEach(h => tocObserver.observe(h));
-    }
-  }
-
-  /* 依据真实空隙决定目录形态；resize / 开关笔记面板 / 切换页面时都会重算 */
-  function layoutToc() {
-    const card = document.getElementById('tocCard');
-    if (!card) return;
-    const content = $('#content');
-    const main = $('#main');
-    const navBtn = $('#tocNavBtn');
-    if (!content || !main) return;
-
-    const cr = content.getBoundingClientRect();
-    const mr = main.getBoundingClientRect();
-    /* #main 的右边缘已自动扣除笔记面板占位，故此处得到的是真实可用空隙 */
-    const avail = mr.right - cr.right;
-    const roomy = avail >= TOC_NEED && window.innerWidth >= 1024;
-
-    card.classList.toggle('toc-gutter', roomy);
-    card.classList.toggle('toc-popover', !roomy);
-
-    if (roomy) {
-      /* roomy 已保证放得下：左边界吸附正文右边缘 + 间距，绝不压住正文 */
-      card.style.left = (cr.right + TOC_GAP) + 'px';
-      card.style.right = 'auto';
-      card.hidden = false;
-      /* 悬浮态尊重用户此前的折叠选择 */
-      const collapsed = Store.getConf().tocCollapsed;
-      card.classList.toggle('collapsed', !!collapsed);
-      if (navBtn) { navBtn.hidden = true; navBtn.setAttribute('aria-expanded', 'false'); }
-    } else {
-      card.style.left = '';
-      card.style.right = '';
-      card.classList.remove('collapsed');
-      card.hidden = true; // 默认收起，点顶栏按钮才展开
-      if (navBtn) { navBtn.hidden = false; navBtn.setAttribute('aria-expanded', 'false'); }
-    }
-  }
-
-  function openTocPopover() {
-    const card = document.getElementById('tocCard');
-    const navBtn = $('#tocNavBtn');
-    if (!card || !card.classList.contains('toc-popover')) return;
-    card.hidden = false;
-    if (navBtn) navBtn.setAttribute('aria-expanded', 'true');
-  }
-  function closeTocPopover() {
-    const card = document.getElementById('tocCard');
-    const navBtn = $('#tocNavBtn');
-    if (!card || !card.classList.contains('toc-popover')) return;
-    card.hidden = true;
-    if (navBtn) navBtn.setAttribute('aria-expanded', 'false');
-  }
-  function toggleTocPopover() {
-    const card = document.getElementById('tocCard');
-    if (!card) return;
-    if (card.classList.contains('toc-gutter')) return; // 悬浮态无需切换
-    if (card.hidden) openTocPopover(); else closeTocPopover();
-  }
-
   /* 未编写内容的占位页 */
   function placeholderHtml(loc) {
     const { meta, chapter, part } = loc;
@@ -1122,14 +971,12 @@
       }
     });
     $('#noteToggleBtn').addEventListener('click', toggleNotePanel);
-    $('#noteCloseBtn').addEventListener('click', () => { document.body.classList.remove('note-open'); layoutToc(); });
+    $('#noteCloseBtn').addEventListener('click', () => document.body.classList.remove('note-open'));
   }
 
   function toggleNotePanel() {
     const open = document.body.classList.toggle('note-open');
     Store.setConf({ noteOpen: open });
-    /* 笔记面板会占用右侧空间，目录需重新判断悬浮/收起形态 */
-    layoutToc();
     if (open) setTimeout(() => $('#noteEditor').focus(), 260);
   }
 
@@ -1564,7 +1411,6 @@
 
   function renderBook(tab = 'fav') {
     currentId = null;
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
     bindNoteForTopic(null, null);
     $('#breadcrumb').innerHTML = `<a href="#/">首页</a> · <b>${tab === 'fav' ? '⭐ 我的收藏' : '❌ 错题本'}</b>`;
 
@@ -1744,7 +1590,6 @@
   /* 随机默写挑战页 */
   function renderDrillPage() {
     currentId = null;
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
     bindNoteForTopic(null, null);
     $('#breadcrumb').innerHTML = `<a href="#/">首页</a> · <a href="#/tpl">模板速查</a> · <b>📝 默写自测</b>`;
     const all = [];
@@ -1805,7 +1650,6 @@
 
   function renderQuizHome() {
     currentId = null;
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
     bindNoteForTopic(null, null);
     $('#breadcrumb').innerHTML = `<a href="#/">首页</a> · <b>📝 章末测验</b>`;
     const scores = Store.allQuizScores();
@@ -1835,7 +1679,6 @@
       return;
     }
     currentId = null;
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
     bindNoteForTopic(null, null);
     const [p, c] = chKey.split('-').map(Number);
     const ch = (window.OUTLINE[p - 1] || {}).chapters && window.OUTLINE[p - 1].chapters[c - 1];
@@ -2116,7 +1959,6 @@ int main() {
         closeAi();
         $('#runnerPanel').classList.remove('open');
         closeSidebarMobile();
-        closeTocPopover();
       }
       if (!typing && e.key === '/' ) {
         e.preventDefault();
@@ -2137,25 +1979,6 @@ int main() {
     });
 
     window.addEventListener('hashchange', router);
-
-    /* 本页导航：顶栏按钮切换弹层；点击空白处收起 */
-    $('#tocNavBtn').addEventListener('click', e => { e.stopPropagation(); toggleTocPopover(); });
-    document.addEventListener('click', e => {
-      const card = document.getElementById('tocCard');
-      if (!card || card.hidden) return;
-      if (card.classList.contains('toc-gutter')) return;
-      if (e.target.closest('#tocCard') || e.target.closest('#tocNavBtn')) return;
-      closeTocPopover();
-    });
-    /* 窗口尺寸变化 / 笔记面板动画结束后重新判定形态（节流 + 动画收尾各一次） */
-    let tocRaf = 0;
-    window.addEventListener('resize', () => {
-      if (tocRaf) return;
-      tocRaf = requestAnimationFrame(() => { tocRaf = 0; layoutToc(); });
-    });
-    $('#main').addEventListener('transitionend', e => {
-      if (e.propertyName === 'margin-right') layoutToc();
-    });
 
     /* 模板速查入口 */
     $('#tplNavBtn').addEventListener('click', () => { location.hash = '#/tpl'; });

@@ -48,17 +48,6 @@ const getJSON = u => new Promise((res, rej) => http.get(u, r => { let d=''; r.on
   await evalJs(`window.__app.applyTheme('eye')`); await sleep(300); await shot('08-home-eye');
   await ws.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
   await go('#/stats'); await shot('09-stats-mobile');
-
-  /* 本页导航两种形态 */
-  await ws.call('Emulation.setDeviceMetricsOverride',{width:1920,height:1000,deviceScaleFactor:1,mobile:false});
-  await evalJs(`window.__app.applyTheme('light')`);
-  await go('#/t/shortest-path'); await shot('10-toc-gutter-1920');
-  await ws.call('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
-  await sleep(700);
-  await evalJs(`document.getElementById('tocNavBtn').click()`); await sleep(300);
-  await shot('11-toc-popover-1440');
-  await evalJs(`window.__app.applyTheme('dark')`); await sleep(350);
-  await shot('12-toc-popover-dark');
   proc.kill();
   console.log('done -> scripts/shots/');
 })().catch(e=>{console.error(e);process.exit(1);});
