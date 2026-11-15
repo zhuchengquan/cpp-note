@@ -322,14 +322,14 @@ body.note-open #main { margin-right: 360px; }
 
 .roadmap { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; box-shadow: var(--shadow); }
 .roadmap ol { margin-left: 4px; }
-.roadmap li { margin: 9px 0; font-size: 14px; }
+.roadmap li { margin: 9px 0; font-size: .93em; }
 .roadmap li b { color: var(--brand); }
 
 /* ============================================================
    知识点页面
    ============================================================ */
 .topic-head { margin-bottom: 22px; }
-.topic-head h1 { font-size: 26px; line-height: 1.35; }
+.topic-head h1 { font-size: 1.73em; line-height: 1.35; }
 .topic-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
 .tag {
   display: inline-block; padding: 1px 9px; border-radius: 20px; font-size: 11.5px;
@@ -341,14 +341,16 @@ body.note-open #main { margin-right: 360px; }
 .status-switch button.on[data-s="1"] { background: var(--accent); color: #fff; }
 .status-switch button.on[data-s="2"] { background: var(--green); color: #fff; }
 
-/* Markdown 正文 */
-.md-body { font-size: 15px; }
+/* Markdown 正文
+   正文字号由 --base-font（设置项，13–32px）驱动；标题/表格/代码等一律用 em
+   相对单位，保证放大字号时整篇排版按比例联动，不会出现"正文变大标题不变"。 */
+.md-body { font-size: var(--base-font, 16px); }
 .md-body h2 {
-  font-size: 20px; margin: 30px 0 12px; padding-left: 11px;
+  font-size: 1.33em; margin: 30px 0 12px; padding-left: 11px;
   border-left: 4px solid var(--brand); line-height: 1.4;
 }
-.md-body h3 { font-size: 17px; margin: 24px 0 9px; }
-.md-body h4 { font-size: 15.5px; margin: 18px 0 7px; }
+.md-body h3 { font-size: 1.13em; margin: 24px 0 9px; }
+.md-body h4 { font-size: 1.033em; margin: 18px 0 7px; }
 .md-body p { margin: 10px 0; }
 .md-body ul, .md-body ol { margin: 10px 0; }
 .md-body li { margin: 5px 0; }
@@ -370,7 +372,7 @@ body.note-open #main { margin-right: 360px; }
 }
 .md-body pre code {
   display: block; padding: 15px 16px; overflow-x: auto;
-  font-size: 13.5px; line-height: 1.7; background: transparent;
+  font-size: .9em; line-height: 1.7; background: transparent;
 }
 /* highlight.js 微调（atom-one-dark 在本项目的风格统一） */
 .md-body pre code.hljs, .md-body pre code { background: var(--code-bg); color: #abb2bf; }
@@ -391,7 +393,7 @@ pre:hover .copy-btn { opacity: 1; }
 
 /* 表格 */
 .md-body table {
-  width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13.5px;
+  width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .9em;
   display: block; overflow-x: auto;
 }
 .md-body th, .md-body td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
@@ -402,7 +404,7 @@ pre:hover .copy-btn { opacity: 1; }
 .md-body blockquote {
   margin: 14px 0; padding: 11px 15px; border-radius: 9px;
   border-left: 4px solid var(--tip-bd); background: var(--tip-bg); color: var(--tip-tx);
-  font-size: 14px;
+  font-size: .93em;
 }
 .md-body blockquote :first-child { margin-top: 0; }
 .md-body blockquote :last-child { margin-bottom: 0; }
@@ -413,7 +415,7 @@ pre:hover .copy-btn { opacity: 1; }
 
 /* ---------- 例题卡片 ---------- */
 .block-head {
-  font-size: 19px; font-weight: 800; margin: 38px 0 14px;
+  font-size: 1.27em; font-weight: 800; margin: 38px 0 14px;
   display: flex; align-items: center; gap: 9px;
 }
 .block-head .count-badge {
@@ -447,7 +449,7 @@ pre:hover .copy-btn { opacity: 1; }
 :root[data-theme="dark"] .ex-level.lv-提高 { background: #2e2410; color: #fbbf24; }
 :root[data-theme="dark"] .ex-level.lv-挑战 { background: #2f1818; color: #f87171; }
 .ex-body { padding: 15px 18px; }
-.ex-body .md-body { font-size: 14px; }
+.ex-body .md-body { font-size: .94em; }
 .io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
 .io-box { border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
 .io-box h5 { padding: 6px 12px; font-size: 12px; background: var(--panel-2); color: var(--muted); border-bottom: 1px solid var(--border); }
@@ -468,9 +470,9 @@ pre:hover .copy-btn { opacity: 1; }
   border: 1px solid var(--pit-bd); background: var(--pit-bg); color: var(--pit-tx);
   border-radius: 13px; padding: 16px 20px; margin: 16px 0;
 }
-.pitfalls-box h3 { color: var(--pit-tx); margin-bottom: 8px; font-size: 16px; }
+.pitfalls-box h3 { color: var(--pit-tx); margin-bottom: 8px; font-size: 1.07em; }
 .pitfalls-box ul { padding-left: 1.3em; }
-.pitfalls-box li { margin: 7px 0; font-size: 14px; }
+.pitfalls-box li { margin: 7px 0; font-size: .93em; }
 .pitfalls-box code:not(pre code) { background: rgba(0,0,0,.07); color: inherit; }
 
 /* 练习题 */
@@ -488,7 +490,7 @@ pre:hover .copy-btn { opacity: 1; }
   border: 1px solid var(--border); background: var(--panel-2); color: var(--brand);
 }
 .exercise-card .ask-ai-btn:hover { border-color: var(--brand); }
-.exercise-statement { font-size: 14px; }
+.exercise-statement { font-size: .93em; }
 .exercise-statement .md-body :first-child { margin-top: 0; }
 
 /* 小结 */
@@ -496,7 +498,7 @@ pre:hover .copy-btn { opacity: 1; }
   margin-top: 36px; border: 2px solid color-mix(in srgb, var(--brand) 30%, transparent);
   background: var(--brand-soft); border-radius: 14px; padding: 18px 22px;
 }
-.summary-box h3 { margin-bottom: 8px; font-size: 16px; color: var(--brand); }
+.summary-box h3 { margin-bottom: 8px; font-size: 1.07em; color: var(--brand); }
 
 /* 上/下页 */
 .pager { display: flex; justify-content: space-between; gap: 14px; margin-top: 44px; }
@@ -647,6 +649,27 @@ body.ai-open #aiFab { display: none; }
 .hint-box ul { margin: 6px 0; padding-left: 1.3em; }
 .hint-box p { margin: 4px 0; }
 .theme-options { display: flex; gap: 12px; }
+/* 正文字号控件：A± 步进 + 滑块 + 预设 chips + 实时预览 */
+.font-step-row { display: flex; align-items: center; gap: 10px; }
+.font-step-row .btn-mini { flex: none; min-width: 44px; font-weight: 700; }
+#fontSizeRange { flex: 1; accent-color: var(--brand); cursor: pointer; }
+.font-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.font-presets .chip {
+  border: 1px solid var(--border-strong); background: var(--panel-2); color: var(--text-soft);
+  border-radius: 999px; padding: 4px 12px; font-size: 12.5px; cursor: pointer;
+}
+.font-presets .chip:hover { border-color: var(--brand); color: var(--brand); }
+.font-presets .chip.active { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+.font-preview {
+  margin-top: 12px; border: 1px dashed var(--border-strong); border-radius: 11px;
+  padding: 10px 14px; background: var(--panel-2); overflow: hidden;
+}
+.font-preview p { font-size: var(--base-font, 16px); margin: 0 0 8px; color: var(--text); }
+.font-preview pre {
+  margin: 0; border-radius: 8px; background: var(--code-bg); color: #abb2bf;
+  padding: 8px 10px; overflow-x: auto;
+}
+.font-preview pre code { font-size: calc(var(--base-font, 16px) * .9); font-family: Consolas, monospace; }
 .theme-card {
   flex: 1; border: 2px solid var(--border); border-radius: 12px; padding: 14px;
   background: var(--panel); color: var(--text); font-size: 13.5px;

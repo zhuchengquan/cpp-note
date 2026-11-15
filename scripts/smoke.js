@@ -195,6 +195,32 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     'mismatch=' + (hlj.mismatch.join(',') || '无') + ' offset=' + hlj.offset);
   check('输入层文字透明仅显示高亮层（光标可见）', hlj.textHidden === true);
 
+  /* 正文字号：上限 32px，且正文/标题/代码按比例联动 */
+  const fontInfo = JSON.parse(await evalJs(`(() => {
+    const px = sel => { const el = document.querySelector(sel); return el ? Math.round(parseFloat(getComputedStyle(el).fontSize) * 10) / 10 : null; };
+    window.__app.setFontSize(32);
+    const big = { p: px('#content .md-body p'), h2: px('#content .md-body h2'), code: px('#content .md-body pre code') };
+    window.__app.setFontSize(16);
+    const base = { p: px('#content .md-body p'), h2: px('#content .md-body h2') };
+    return JSON.stringify({
+      max: document.getElementById('fontSizeRange').max,
+      min: document.getElementById('fontSizeRange').min,
+      chips: document.querySelectorAll('#fontPresets .chip').length,
+      big, base,
+      overflow: document.documentElement.scrollWidth > window.innerWidth,
+    });
+  })()`));
+  check('字号可自定义到 32px（上限不再受 20px 限制）', Number(fontInfo.max) === 32 && fontInfo.big.p === 32,
+    'range=' + fontInfo.min + '–' + fontInfo.max + ' 实际=' + fontInfo.big.p + 'px');
+  check('放大字号时标题/代码按比例联动', fontInfo.big.h2 > fontInfo.base.h2 && fontInfo.big.code > 20,
+    'h2 ' + fontInfo.base.h2 + '→' + fontInfo.big.h2 + 'px, code=' + fontInfo.big.code + 'px');
+  check('字号预设按钮齐备（6 档）', fontInfo.chips === 6);
+  check('最大字号下无横向溢出', fontInfo.overflow === false);
+
+  /* 回到默认字号，后续截图与断言基于默认排版 */
+  await evalJs(`window.__app.setFontSize(16)`);
+  await sleep(120);
+
   /* 桌面截图 */
   await pws.call('Page.navigate', { url: TARGET.replace('index.html', '#/') });
   await sleep(1200);

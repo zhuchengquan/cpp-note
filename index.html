@@ -200,7 +200,24 @@
         <button class="theme-card" data-set-theme="dark"><span class="theme-dot" style="background:#1a2233"></span>🌙 深色</button>
       </div>
       <label class="field-label">正文字号：<b id="fontSizeVal">16px</b></label>
-      <input id="fontSizeRange" type="range" min="14" max="20" step="1" value="16" />
+      <div class="font-step-row">
+        <button class="btn-mini" id="fontMinus" type="button" title="减小字号">A－</button>
+        <input id="fontSizeRange" type="range" min="13" max="32" step="1" value="16" aria-label="正文字号" />
+        <button class="btn-mini" id="fontPlus" type="button" title="增大字号">A＋</button>
+      </div>
+      <div class="font-presets" id="fontPresets">
+        <button class="chip" type="button" data-font="14">小 14</button>
+        <button class="chip" type="button" data-font="16">标准 16</button>
+        <button class="chip" type="button" data-font="18">舒适 18</button>
+        <button class="chip" type="button" data-font="22">大 22</button>
+        <button class="chip" type="button" data-font="26">特大 26</button>
+        <button class="chip" type="button" data-font="32">超大 32</button>
+      </div>
+      <div class="font-preview" id="fontPreview">
+        <p>预览：前缀和与差分是竞赛中最常用的预处理技巧之一，能把 O(n²) 的区间查询降到 O(n)。</p>
+        <pre><code>int a[N], s[N];  // s[i] = a[1] + … + a[i]</code></pre>
+      </div>
+      <button class="btn-mini" id="fontReset" type="button" style="margin-top:10px">恢复默认 16px</button>
     </div>
 
     <!-- 数据设置 -->

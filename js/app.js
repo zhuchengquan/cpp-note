@@ -7,7 +7,7 @@
   'use strict';
 
   /* 版本号（单一事实来源；index.html 与 PWA 缓存版本同步） */
-  const APP_VERSION = '1.1.4';
+  const APP_VERSION = '1.1.5';
   window.APP_VERSION = APP_VERSION;
 
   /* 受控调试/自检钩子（不暴露内部数据写操作） */
@@ -15,6 +15,8 @@
     sanitizeMd: (s) => safeMd(s, true),
     applyTheme: (t) => applyTheme(t),
     getTheme: () => document.documentElement.dataset.theme,
+    setFontSize: (px) => applyFontSize(px),
+    getFontSize: () => Number(getComputedStyle(document.documentElement).getPropertyValue('--base-font').replace('px', '')) || FONT_DEF,
   };
 
   /* 全局错误兜底：避免单点异常导致整站白屏；开发期在控制台保留详情 */
@@ -1254,16 +1256,9 @@
       }
     });
 
-    /* 外观 */
+    /* 外观：主题与正文字号的事件绑定（字号逻辑见 applyFontSize） */
     $$('.theme-card').forEach(card => card.addEventListener('click', () => applyTheme(card.dataset.setTheme)));
-    const range = $('#fontSizeRange');
-    range.value = Store.getConf().fontSize || 16;
-    $('#fontSizeVal').textContent = range.value + 'px';
-    range.addEventListener('input', () => {
-      document.documentElement.style.setProperty('--base-font', range.value + 'px');
-      $('#fontSizeVal').textContent = range.value + 'px';
-      Store.setConf({ fontSize: Number(range.value) });
-    });
+    bindFontSizeControls();
 
     /* 数据 */
     $('#exportJsonBtn').addEventListener('click', exportJson);
@@ -1376,6 +1371,31 @@
   }
   function toggleTheme() {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+  }
+
+  /* ---------------- 正文字号（13–32px，全部正文按 em 比例联动） ---------------- */
+  const FONT_MIN = 13, FONT_MAX = 32, FONT_DEF = 16;
+  function applyFontSize(px, persist = true) {
+    const v = Math.max(FONT_MIN, Math.min(FONT_MAX, Math.round(Number(px) || FONT_DEF)));
+    document.documentElement.style.setProperty('--base-font', v + 'px');
+    const range = $('#fontSizeRange');
+    if (range) range.value = v;
+    const valEl = $('#fontSizeVal');
+    if (valEl) valEl.textContent = v + 'px';
+    $$('#fontPresets .chip').forEach(c => c.classList.toggle('active', Number(c.dataset.font) === v));
+    if (persist) Store.setConf({ fontSize: v });
+    return v;
+  }
+  function bindFontSizeControls() {
+    const range = $('#fontSizeRange');
+    applyFontSize(Store.getConf().fontSize, false);
+    if (range) range.addEventListener('input', () => applyFontSize(range.value));
+    const step = d => applyFontSize((Number(range && range.value) || FONT_DEF) + d);
+    if ($('#fontMinus')) $('#fontMinus').addEventListener('click', () => step(-1));
+    if ($('#fontPlus')) $('#fontPlus').addEventListener('click', () => step(1));
+    $$('#fontPresets .chip').forEach(c =>
+      c.addEventListener('click', () => applyFontSize(Number(c.dataset.font))));
+    if ($('#fontReset')) $('#fontReset').addEventListener('click', () => applyFontSize(FONT_DEF));
   }
 
   /* ---------------- 移动端侧栏 ---------------- */
@@ -2084,9 +2104,8 @@ int main() {
   function init() {
     const conf = Store.getConf();
     applyTheme(conf.theme);
-    if (conf.fontSize) {
-      document.documentElement.style.setProperty('--base-font', conf.fontSize + 'px');
-    }
+    /* 字号在首屏渲染前就应用，避免闪一下默认大小；超范围的历史值会被夹紧 */
+    applyFontSize(conf.fontSize, false);
     /* 笔记面板仅在宽屏自动恢复；窄屏下面板会盖住正文，不自动弹出 */
     if (conf.noteOpen && window.innerWidth > 860) document.body.classList.add('note-open');
 
