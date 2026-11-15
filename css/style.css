@@ -1,6 +1,6 @@
 /* ============================================================
    信息学 C++ 学习手册 · 样式表
-   设计：CSS 变量驱动三套主题 / 响应式 / 竞赛风代码块
+   设计：CSS 变量驱动两套主题（明亮 / 深色） / 响应式 / 竞赛风代码块
    ============================================================ */
 
 /* ---------- 主题变量 ---------- */
@@ -25,29 +25,6 @@
   --code-bg: #282c34;
   --shadow: 0 1px 3px rgba(15,23,42,.08), 0 4px 16px rgba(15,23,42,.06);
   --sidebar-bg: #ffffff;
-  color-scheme: light;
-}
-:root[data-theme="eye"] {
-  --bg: #dfeee2;
-  --panel: #f2f8f1;
-  --panel-2: #e7f2e8;
-  --text: #2f3d33;
-  --text-soft: #4a5c4f;
-  --muted: #7d9283;
-  --border: #c8dccb;
-  --border-strong: #a8c4ad;
-  --brand: #2e7d4f;
-  --brand-2: #236340;
-  --brand-soft: #e3f2e7;
-  --accent: #c27803;
-  --green: #2e7d4f;
-  --red: #c0392b;
-  --warn-bg: #fbf6e3; --warn-bd: #e3cf8a; --warn-tx: #7a5a10;
-  --tip-bg: #e6f1e9;  --tip-bd: #9fc7a8; --tip-tx: #245538;
-  --pit-bg: #f9e8e6; --pit-bd: #dda29b; --pit-tx: #832519;
-  --code-bg: #282c34;
-  --shadow: 0 1px 3px rgba(40,60,45,.1), 0 4px 16px rgba(40,60,45,.08);
-  --sidebar-bg: #f2f8f1;
   color-scheme: light;
 }
 :root[data-theme="dark"] {

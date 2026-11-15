@@ -132,8 +132,25 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     xss && !xss.hasHandler && !xss.hasScript && xss.keepsStrong, JSON.stringify(xss));
 
   /* 主题切换 */
-  await evalJs(`window.__app.applyTheme('dark')`);
-  check('深色主题切换生效', await evalJs(`window.__app.getTheme() === 'dark'`));
+  check('仅保留明亮/深色两套主题', await evalJs(`(() => {
+    const cards = [...document.querySelectorAll('.theme-card')].map(c => c.dataset.setTheme);
+    const css = [...document.styleSheets].flatMap(s => { try { return [...s.cssRules]; } catch (e) { return []; } })
+      .map(r => r.cssText).join('');
+    return cards.length === 2 && cards.join(',') === 'light,dark' && !/data-theme="eye"/.test(css);
+  })()`), 'cards=' + await evalJs(`[...document.querySelectorAll('.theme-card')].map(c=>c.dataset.setTheme).join(',')`));
+  check('切到深色生效', await evalJs(`(function(){ window.__app.applyTheme('dark'); return window.__app.getTheme() === 'dark'; })()`));
+  check('顶栏按钮在明亮/深色间二态往返', await evalJs(`(function(){
+    const btn = document.getElementById('themeBtn');
+    window.__app.applyTheme('light'); btn.click();
+    const a = window.__app.getTheme();
+    btn.click();
+    const b = window.__app.getTheme();
+    return a === 'dark' && b === 'light' && btn.textContent.trim() === '🌙';
+  })()`));
+  check('遗留的 eye 主题值被安全归一为明亮', await evalJs(`(function(){
+    window.__app.applyTheme('eye');
+    return document.documentElement.dataset.theme === 'light';
+  })()`));
 
   /* 模板页 */
   await pws.call('Page.navigate', { url: TARGET.replace('index.html', '#/tpl') });

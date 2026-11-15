@@ -7,7 +7,7 @@
   'use strict';
 
   /* 版本号（单一事实来源；index.html 与 PWA 缓存版本同步） */
-  const APP_VERSION = '1.1.3';
+  const APP_VERSION = '1.1.4';
   window.APP_VERSION = APP_VERSION;
 
   /* 受控调试/自检钩子（不暴露内部数据写操作） */
@@ -1364,12 +1364,18 @@
     e.target.value = '';
   }
 
-  /* ---------------- 主题 ---------------- */
+  /* ---------------- 主题（仅明亮 / 深色两套） ---------------- */
+  const THEMES = ['light', 'dark'];
+  function normalizeTheme(t) { return THEMES.includes(t) ? t : 'light'; }
   function applyTheme(theme) {
+    theme = normalizeTheme(theme);
     document.documentElement.dataset.theme = theme;
     Store.setConf({ theme });
     $$('.theme-card').forEach(c => c.classList.toggle('active', c.dataset.setTheme === theme));
     $('#themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+  function toggleTheme() {
+    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   }
 
   /* ---------------- 移动端侧栏 ---------------- */
@@ -1901,10 +1907,7 @@ int main() {
     { id: 'wrong', icon: '❌', label: '错题本', kw: 'wrong cuoti 错题', run: () => { location.hash = '#/book/wrong'; } },
     { id: 'ai', icon: '🤖', label: '打开 AI 私教', kw: 'ai chat 私教 提问', run: () => { openAi(); } },
     { id: 'note', icon: '📝', label: '打开 / 关闭笔记面板', kw: 'note biji 笔记', run: () => { toggleNotePanel(); } },
-    { id: 'theme', icon: '🎨', label: '切换主题', kw: 'theme zhuti 主题 深色', run: () => {
-        const cur = document.documentElement.dataset.theme;
-        applyTheme(cur === 'light' ? 'eye' : cur === 'eye' ? 'dark' : 'light');
-      } },
+    { id: 'theme', icon: '🎨', label: '切换明亮 / 深色主题', kw: 'theme zhuti 主题 深色 明亮', run: () => { toggleTheme(); } },
     { id: 'settings', icon: '⚙️', label: '打开设置', kw: 'settings shezhi 设置', run: () => { $('#settingsBtn').click(); } },
   ];
 
@@ -2002,10 +2005,7 @@ int main() {
   function bindGlobal() {
     $('#menuBtn').addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
     $('#sidebarMask').addEventListener('click', closeSidebarMobile);
-    $('#themeBtn').addEventListener('click', () => {
-      const cur = document.documentElement.dataset.theme;
-      applyTheme(cur === 'light' ? 'eye' : cur === 'eye' ? 'dark' : 'light');
-    });
+    $('#themeBtn').addEventListener('click', toggleTheme);
 
     document.addEventListener('keydown', e => {
       const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);

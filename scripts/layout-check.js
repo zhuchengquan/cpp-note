@@ -93,6 +93,6 @@ const getJSON = u => new Promise((res, rej) => http.get(u, r => { let d=''; r.on
 
   console.log('\n===== 布局断言 =====');
   if (problems.length) { problems.forEach(p => console.log('❌ ' + p)); proc.kill(); process.exit(1); }
-  console.log('✅ 桌面/移动端 × 6 个页面 × 3 主题：无横向溢出、关键布局正常');
+  console.log('✅ 桌面/移动端 × 6 个页面 × 明亮/深色主题：无横向溢出、关键布局正常');
   proc.kill();
 })().catch(e => { console.error(e); process.exit(1); });

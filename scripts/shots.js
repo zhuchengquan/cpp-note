@@ -43,9 +43,9 @@ const getJSON = u => new Promise((res, rej) => http.get(u, r => { let d=''; r.on
   await go('#/'); await evalJs(`window.__cmdk.open()`); await sleep(300);
   await evalJs(`const i=document.getElementById('cmdkInput');i.value='图';i.dispatchEvent(new Event('input'));`); await sleep(300);
   await shot('07-command-palette');
-  /* 护眼主题首页 + 移动端看板 */
+  /* 深色主题首页 + 移动端看板 */
   await evalJs(`window.__cmdk.close()`);
-  await evalJs(`window.__app.applyTheme('eye')`); await sleep(300); await shot('08-home-eye');
+  await evalJs(`window.__app.applyTheme('dark')`); await sleep(300); await shot('08-home-dark');
   await ws.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
   await go('#/stats'); await shot('09-stats-mobile');
   proc.kill();
