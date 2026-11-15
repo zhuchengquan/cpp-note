@@ -1,10 +1,16 @@
 # 📘 信息学 C++ 学习手册（CSP-J / CSP-S）
 
+[![CI](https://github.com/zhuchengquan/cpp-note/actions/workflows/ci.yml/badge.svg)](https://github.com/zhuchengquan/cpp-note/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Offline 100%](https://img.shields.io/badge/offline-100%25-brightgreen.svg)](#-快速开始)
+[![Runtime deps](https://img.shields.io/badge/runtime%20deps-0-success.svg)](#-技术说明)
+
 一个**零运行时依赖、双击即用、完全离线、可安装**的专业级静态学习网站：面向信息学奥赛学员的
 系统化 C++ 讲义，包含知识点详解、带中文注释的代码、例题精讲、课后练习、章末测验、背模板默写、
 学习数据看板、个人笔记与 AI 私教答疑。
 
-> 版本 **v1.1.0** · 纯原生 HTML/CSS/JavaScript，无构建步骤、无框架、无后端。
+> 版本 **v1.1.6** · 纯原生 HTML/CSS/JavaScript，无构建步骤、无框架、无后端。
+> 仓库地址：https://github.com/zhuchengquan/cpp-note
 
 ## 🚀 快速开始
 
@@ -196,4 +202,5 @@ node scripts/build-sw.js     # 由 index.html 重新生成 sw.js 预缓存清单
 
 ## 📄 许可证
 
-MIT，见 [LICENSE](LICENSE)。内置第三方库：marked (MIT)、highlight.js (BSD-3-Clause)、DOMPurify (Apache-2.0/MPL-2.0)。
+MIT，见 [LICENSE](LICENSE)。内置第三方库（marked / highlight.js / DOMPurify）的许可见
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

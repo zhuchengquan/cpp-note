@@ -2,6 +2,18 @@
 
 本项目遵循语义化版本（SemVer）。
 
+## [1.1.6] - 2026-11-15
+
+### 工程化（首次发布到 GitHub 后的 CI 修复）
+- **CI 稳定性**：无头浏览器改为用 `browser-actions/setup-chrome` 安装真实 Chrome（原 apt/snap
+  在容器里会装出不可用的 chromium 壳，导致冒烟步骤失败）；测试脚本统一读取 `CHROME_PATH`。
+- 新增 `scripts/browser.js` 统一浏览器定位与启动参数：补齐 `--no-sandbox`、`--disable-dev-shm-usage`
+  等容器/root 环境必需参数，四个浏览器测试脚本共用。
+- 冒烟测试在浏览器启动失败时输出自身 stderr 尾部（CI 日志可直接定位原因），启动等待延长到 30s。
+- `LICENSE` 改为纯 MIT 文本（此前混入第三方声明导致 GitHub 识别为 “Other”），第三方组件声明
+  迁移到 `THIRD-PARTY-NOTICES.md`，GitHub 许可证徽章现在正确显示 **MIT**。
+- `package.json` 补充 `repository` / `bugs` / `homepage`；README 增加 CI、许可证、离线、零依赖徽章。
+
 ## [1.1.5] - 2026-11-15
 
 ### 变更

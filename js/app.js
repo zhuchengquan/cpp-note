@@ -7,7 +7,7 @@
   'use strict';
 
   /* 版本号（单一事实来源；index.html 与 PWA 缓存版本同步） */
-  const APP_VERSION = '1.1.5';
+  const APP_VERSION = '1.1.6';
   window.APP_VERSION = APP_VERSION;
 
   /* 受控调试/自检钩子（不暴露内部数据写操作） */

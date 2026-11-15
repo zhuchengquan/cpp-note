@@ -22,16 +22,18 @@ jobs:
         run: |
           node scripts/build-sw.js
           if ! git diff --quiet -- sw.js; then
-            echo "sw.js 与 index.html 引用不一致，请运行 node scripts/build-sw.js 并提交"
+            echo "::error::sw.js 与 index.html 引用不一致，请运行 node scripts/build-sw.js 并提交"
             git --no-pager diff -- sw.js
             exit 1
           fi
 
-      - name: 安装 Chromium（无头测试用）
-        run: |
-          if ! command -v google-chrome && ! command -v chromium && ! command -v chromium-browser; then
-            sudo apt-get update && sudo apt-get install -y chromium-browser || sudo snap install chromium
-          fi
+      # 用官方动作安装 Chrome，避免 apt/snap 在容器里装出不可用的 chromium 壳
+      - name: 安装 Chrome（无头测试用）
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+          install-chromedriver: false
 
       - name: 启动本地服务器
         run: |
@@ -39,21 +41,31 @@ jobs:
           for i in $(seq 1 30); do curl -sf http://localhost:8123/index.html >/dev/null && break; sleep 1; done
 
       - name: 无头浏览器冒烟测试
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: node scripts/smoke.js
 
-      - name: 布局/响应式断言（桌面+移动、多主题、无横向溢出）
+      - name: 布局/响应式断言（桌面+移动、明亮/深色、无横向溢出）
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: node scripts/layout-check.js
 
       - name: PWA 离线能力验证
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: node scripts/verify-pwa.js
 
       - name: file:// 双击模式兼容性验证
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
         run: node scripts/verify-file.js
 
-      - name: 上传冒烟截图
+      - name: 上传冒烟截图（便于直观看渲染结果）
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: smoke-screenshots
-          path: scripts/smoke-*.png
+          path: |
+            scripts/smoke-*.png
+            scripts/shots/*.png
           if-no-files-found: ignore

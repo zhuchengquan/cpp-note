@@ -4,27 +4,21 @@
 const fs = require('fs'), os = require('os'), path = require('path'), http = require('http'),
   { spawn } = require('child_process');
 const { createWS } = require('./cdp');
+const { findBrowser, launchArgs, remotePortArgs } = require('./browser');
 
 const TARGET = process.argv[2] || 'http://localhost:8123/index.html';
-const PORT = 9333;
-const CANDIDATES = [
-  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable',
-  '/usr/bin/chromium', '/usr/bin/chromium-browser', '/snap/bin/chromium',
-];
+const PORT = Number(process.env.CDP_PORT) || 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const getJSON = (u) => new Promise((res, rej) => http.get(u, (r) => { let d = ''; r.on('data', c => d += c); r.on('end', () => res(JSON.parse(d))); }).on('error', rej));
 
 (async () => {
-  const exe = CANDIDATES.find(fs.existsSync);
+  const exe = findBrowser();
   if (!exe) { console.log('⚠️ 无浏览器，跳过'); process.exit(0); }
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'cppnote-pwa-'));
-  const proc = spawn(exe, ['--headless=new', '--disable-gpu', '--no-first-run', `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, TARGET], { stdio: 'ignore' });
+  const proc = spawn(exe, [...remotePortArgs(PORT), ...launchArgs(profile, TARGET)], { stdio: 'ignore' });
   let ver;
-  for (let i = 0; i < 40; i++) { await sleep(500); try { ver = await getJSON(`http://127.0.0.1:${PORT}/json/version`); break; } catch (e) {} }
-  if (!ver) { proc.kill(); console.log('❌ 启动超时'); process.exit(1); }
+  for (let i = 0; i < 60; i++) { await sleep(500); try { ver = await getJSON(`http://127.0.0.1:${PORT}/json/version`); break; } catch (e) {} }
+  if (!ver) { proc.kill(); console.log('❌ PWA 验证：无头浏览器启动失败'); process.exit(1); }
   await sleep(1000);
   const pages = await getJSON(`http://127.0.0.1:${PORT}/json`);
   const page = pages.find(p => p.type === 'page' && p.url.startsWith('http'));

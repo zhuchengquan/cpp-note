@@ -1,6 +1,6 @@
 {
   "name": "cpp-note",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "private": true,
   "description": "信息学 C++ 学习手册（CSP-J/CSP-S）：零依赖、双击即用、完全离线的静态学习网站",
   "type": "commonjs",
@@ -27,6 +27,14 @@
     "static-site"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhuchengquan/cpp-note.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zhuchengquan/cpp-note/issues"
+  },
+  "homepage": "https://github.com/zhuchengquan/cpp-note#readme",
   "engines": {
     "node": ">=16"
   }

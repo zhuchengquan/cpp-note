@@ -15,25 +15,11 @@ const path = require('path');
 const http = require('http');
 const { spawn } = require('child_process');
 const { createWS } = require('./cdp');
+const { findBrowser, launchArgs, remotePortArgs } = require('./browser');
 
 const TARGET = process.argv[2] || 'http://localhost:8123/index.html';
-const PORT = 9222;
+const PORT = Number(process.env.CDP_PORT) || 9222;
 
-const CANDIDATES_WIN = [
-  'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-];
-const CANDIDATES_NIX = [
-  '/usr/bin/microsoft-edge', '/usr/bin/google-chrome',
-  '/usr/bin/google-chrome-stable', '/usr/bin/chromium',
-  '/usr/bin/chromium-browser', '/snap/bin/chromium',
-];
-const findBrowser = () => {
-  const list = os.platform() === 'win32' ? CANDIDATES_WIN : CANDIDATES_NIX;
-  return list.find((p) => fs.existsSync(p)) || null;
-};
 const getJSON = (url) => new Promise((resolve, reject) => {
   http.get(url, (res) => {
     let d = '';
@@ -46,18 +32,28 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 (async () => {
   const browserPath = findBrowser();
   if (!browserPath) { console.log('⚠️  未找到 Edge/Chrome，跳过无头冒烟测试'); process.exit(0); }
+  console.log('浏览器:', browserPath);
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'cppnote-smoke-'));
-  const proc = spawn(browserPath, [
-    '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
-    `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, TARGET,
-  ], { stdio: 'ignore' });
+  /* 收集浏览器自身输出：CI 上启动失败时是唯一的诊断线索 */
+  let bootLog = '';
+  const proc = spawn(browserPath,
+    [...remotePortArgs(PORT), ...launchArgs(profile, TARGET)],
+    { stdio: ['ignore', 'pipe', 'pipe'] });
+  proc.stdout.on('data', (c) => { bootLog = (bootLog + c).slice(-4000); });
+  proc.stderr.on('data', (c) => { bootLog = (bootLog + c).slice(-4000); });
 
   let ver;
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 60; i++) {
     await sleep(500);
+    if (proc.exitCode !== null) break; // 进程已退出，无需再等
     try { ver = await getJSON(`http://127.0.0.1:${PORT}/json/version`); break; } catch (e) {}
   }
-  if (!ver) { proc.kill(); console.log('❌ 无头浏览器启动超时'); process.exit(1); }
+  if (!ver) {
+    proc.kill();
+    console.log('❌ 无头浏览器启动失败（exit=' + proc.exitCode + '）');
+    if (bootLog.trim()) console.log('--- 浏览器输出 ---\n' + bootLog.trim().split('\n').slice(-20).join('\n'));
+    process.exit(1);
+  }
 
   await sleep(800);
   const pages = await getJSON(`http://127.0.0.1:${PORT}/json`);
