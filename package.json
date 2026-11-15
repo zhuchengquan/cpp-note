@@ -1,6 +1,6 @@
 {
   "name": "cpp-note",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "private": true,
   "description": "信息学 C++ 学习手册（CSP-J/CSP-S）：零依赖、双击即用、完全离线的静态学习网站",
   "type": "commonjs",

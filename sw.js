@@ -1,6 +1,6 @@
 /* 由 scripts/build-sw.js 自动生成，请勿手工编辑预缓存清单 */
 'use strict';
-const CACHE = 'cppnote-v1.1.2-a085fd8f';
+const CACHE = 'cppnote-v1.1.3-dbfff7a3';
 const PRECACHE = [
   "./css/style.css",
   "./icons/apple-touch-icon.png",

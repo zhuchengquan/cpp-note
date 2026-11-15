@@ -146,6 +146,38 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await sleep(1200);
   check('测验题渲染 ≥ 2', await evalJs('document.querySelectorAll("#content .q-card").length >= 2'));
 
+  /* 在线运行：代码实时高亮（高亮层与输入层严格对齐） */
+  await pws.call('Page.navigate', { url: TARGET.replace('index.html', '#/t/shortest-path') });
+  await sleep(1200);
+  await evalJs('document.querySelector("#content .code-run").click()');
+  await sleep(500);
+  const hl = await evalJs(`(() => {
+    const ta = document.getElementById('runCode');
+    const pre = document.querySelector('.run-hl');
+    const codeEl = document.getElementById('runHl');
+    const cs = el => getComputedStyle(el);
+    const taCS = cs(ta), preCS = cs(pre);
+    const spans = codeEl.querySelectorAll('span').length;
+    const kw = codeEl.querySelector('span');
+    const mismatch = ['fontFamily','fontSize','lineHeight','paddingTop','paddingLeft','tabSize','whiteSpace']
+      .filter(k => String(taCS[k] || taCS.getPropertyValue(k)) !== String(preCS[k] || preCS.getPropertyValue(k)));
+    const r1 = ta.getBoundingClientRect(), r2 = pre.getBoundingClientRect();
+    return JSON.stringify({
+      open: document.getElementById('runnerPanel').classList.contains('open'),
+      spans,
+      color: kw ? cs(kw).color : '',
+      mismatch,
+      offset: Math.round(Math.abs(r1.top - r2.top) + Math.abs(r1.left - r2.left)),
+      textHidden: /rgba\\(0, 0, 0, 0\\)|transparent/.test(String(taCS.webkitTextFillColor || taCS.getPropertyValue('-webkit-text-fill-color'))),
+    });
+  })()`);
+  const hlj = JSON.parse(hl);
+  check('在线运行代码已语法高亮（含 hljs 标记）', hlj.spans > 3, 'spans=' + hlj.spans);
+  check('高亮着色生效（非默认色）', /^rgb/.test(hlj.color) && hlj.color !== 'rgb(171, 178, 191)', hlj.color);
+  check('高亮层与输入层排版完全对齐', hlj.mismatch.length === 0 && hlj.offset <= 1,
+    'mismatch=' + (hlj.mismatch.join(',') || '无') + ' offset=' + hlj.offset);
+  check('输入层文字透明仅显示高亮层（光标可见）', hlj.textHidden === true);
+
   /* 桌面截图 */
   await pws.call('Page.navigate', { url: TARGET.replace('index.html', '#/') });
   await sleep(1200);

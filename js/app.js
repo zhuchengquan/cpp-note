@@ -7,7 +7,7 @@
   'use strict';
 
   /* 版本号（单一事实来源；index.html 与 PWA 缓存版本同步） */
-  const APP_VERSION = '1.1.2';
+  const APP_VERSION = '1.1.3';
   window.APP_VERSION = APP_VERSION;
 
   /* 受控调试/自检钩子（不暴露内部数据写操作） */
@@ -1747,6 +1747,66 @@
   /* ============================================================
      v3 功能四：C++ 在线运行沙箱（Wandbox）
      ============================================================ */
+  /* 代码实时高亮：透明 textarea 叠在高亮层上，两层排版参数完全一致。
+     依赖内置 highlight.js（v11）；缺失时退化为纯转义文本，仍可正常编辑。 */
+  let runHl = null;
+  function initRunHighlight() {
+    const ta = $('#runCode');
+    const pre = $('.run-hl');
+    const codeEl = $('#runHl');
+    if (!ta || !pre || !codeEl) return null;
+
+    const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const syncScroll = () => { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; };
+
+    function paint() {
+      const src = ta.value;
+      let html = null;
+      if (window.hljs && typeof window.hljs.highlight === 'function') {
+        try {
+          html = window.hljs.highlight(src, { language: 'cpp', ignoreIllegals: true }).value;
+        } catch (e) { html = null; }
+      }
+      /* 末尾补一个换行：保证最后一行在 pre 里始终可见（与 textarea 高度对齐） */
+      codeEl.innerHTML = (html == null ? esc(src) : html) + '\n';
+      syncScroll();
+    }
+
+    let raf = 0;
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; paint(); });
+    };
+
+    ta.addEventListener('input', schedule);
+    ta.addEventListener('scroll', syncScroll, { passive: true });
+    /* Tab 缩进 4 空格（Shift+Tab 反向缩进），让手写代码更顺手 */
+    ta.addEventListener('keydown', e => {
+      if (e.key !== 'Tab' || e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      const start = ta.selectionStart, end = ta.selectionEnd, v = ta.value;
+      if (e.shiftKey) {
+        /* 反向缩进：删除光标前最多 4 个空格 */
+        const lineStart = v.lastIndexOf('\n', start - 1) + 1;
+        const lead = v.slice(lineStart, start);
+        const cut = lead.length - lead.replace(/^ {1,4}/, '').length;
+        if (cut > 0) {
+          ta.value = v.slice(0, start - cut) + v.slice(start);
+          ta.selectionStart = ta.selectionEnd = start - cut;
+        }
+      } else {
+        const indent = '    ';
+        ta.value = v.slice(0, start) + indent + v.slice(end);
+        ta.selectionStart = ta.selectionEnd = start + indent.length;
+      }
+      schedule();
+    });
+
+    /* 面板尺寸变化后需重新对齐（pre 高度取 textarea 实际内容高度无关，靠滚动同步即可） */
+    runHl = { paint, syncScroll };
+    return runHl;
+  }
+
   function openRunner(code) {
     $('#runCode').value = code || `#include <iostream>
 using namespace std;
@@ -1761,9 +1821,13 @@ int main() {
     const out = $('#runOut');
     out.className = ''; out.textContent = '';
     $('#runnerPanel').classList.add('open');
-    setTimeout(() => $('#runCode').focus(), 60);
+    /* 面板变为可见后再高亮（隐藏时尺寸为 0，浏览器仍能排版，但先 paint 更稳） */
+    if (runHl) runHl.paint();
+    $('#runCode').scrollTop = 0;
+    setTimeout(() => { $('#runCode').focus(); if (runHl) runHl.syncScroll(); }, 60);
   }
   function initRunner() {
+    initRunHighlight();
     $('#runCloseBtn').addEventListener('click', () => $('#runnerPanel').classList.remove('open'));
     $('#runBtn').addEventListener('click', async () => {
       const btn = $('#runBtn');

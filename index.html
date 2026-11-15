@@ -116,8 +116,12 @@
     <button id="runCloseBtn" class="icon-btn-sm" title="关闭">✕</button>
   </div>
   <div class="run-body">
-    <span class="run-label">代码</span>
-    <textarea id="runCode" spellcheck="false"></textarea>
+    <span class="run-label">代码 <em class="run-label-tip">实时高亮 · Tab 缩进 4 空格</em></span>
+    <div class="run-editor">
+      <pre class="run-hl" aria-hidden="true"><code id="runHl" class="hljs language-cpp"></code></pre>
+      <textarea id="runCode" spellcheck="false" wrap="off" autocomplete="off"
+                autocapitalize="off" aria-label="C++ 代码编辑区"></textarea>
+    </div>
     <span class="run-label">标准输入（可选）</span>
     <textarea id="runStdin" placeholder="程序需要 cin 输入的数据写在这里…" spellcheck="false"></textarea>
     <div><button id="runBtn">▶ 编译并运行</button></div>
